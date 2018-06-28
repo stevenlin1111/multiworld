@@ -378,7 +378,7 @@ class SawyerPickAndPlaceEnvYZ(SawyerPickAndPlaceEnv):
 
     def _reset_hand(self):
         for _ in range(10):
-            self.data.set_mocap_pos('mocap', np.array([0, 0.6, 0.23]))
+            self.data.set_mocap_pos('mocap', np.array([0, 0.6, 0.2]))
             self.data.set_mocap_quat('mocap', np.array([1, 0, 1, 0]))
             self.do_simulation(None, self.frame_skip)
 
@@ -414,9 +414,10 @@ class SawyerPickAndPlaceEnvYZ(SawyerPickAndPlaceEnv):
         corrected_obj_pos[0] = self.x_axis
         corrected_obj_pos[2] = max(corrected_obj_pos[2], self.obj_init_pos[2])
         self._set_obj_xyz(corrected_obj_pos)
-        action = np.array(1 - 2 * (np.random.random() > .7))
+        action = np.array(1 - 2 * (np.random.random() > .8))
+        if state_goal[5] == self.obj_init_pos[2]:
+            action = np.array(1 - 2 * (np.random.random() > .5))
         self.do_simulation(action)
-        self.render()
         new_obj_pos = self.data.get_site_xpos('obj')
 #        new_obj_pos[0] = self.x_axis
 #        self._set_obj_xyz(new_obj_pos)
