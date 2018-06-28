@@ -3,21 +3,35 @@
     <include file="shared_config.xml"></include>
     <worldbody>
         <include file="sawyer_xyz_base_hidden_arm.xml"></include>
-        <body name="obj" pos="0 0 0.1">
-            <joint name="objjoint" type="free" limited='false' damping="0" armature="0" />
-            <inertial pos="0 0 0" mass="10" diaginertia="100000 100000 100000"/>
-            <geom name="objbox" type="box" pos="0 0 0"
+        <body name="obj0" pos="0 0 0.1">
+            <joint name="objjoint0" type="free" limited='false' damping="0" armature="0" />
+            <inertial pos="0 0 0" mass="1" diaginertia="100000 100000 100000"/>
+            <geom name="objbox0" type="box" pos="0 0 0"
                   size=".010 .01 .01" rgba=".1 .1 .9 1"
                   contype="7" conaffinity="7" friction="1.0 0.10 0.002" condim="4" mass=1.0/>
-                <body name="obj_T" pos="0.0 0.0 0.01" >
+                <body name="obj_T0" pos="0.0 0.0 0.01" >
                     <geom
-                     name="T_obj" condim="4" contype="2" conaffinity="2" class="1" mass="0.08" type="box" pos="0 0 0" size="0.012 0.012 0.001" rgba="0.0 0.0 1.0 1.0" friction="1 0.05 0.01"/>
+                     name="T_obj0" condim="4" contype="2" conaffinity="2" class="1" mass="0.08" type="box" pos="0 0 0" size="0.012 0.012 0.001" rgba="0.0 0.0 1.0 1.0" friction="1 0.05 0.01"/>
                 </body>
 
-            <site name="obj" pos="0 0 0" size="0.035" rgba="0.0 0.0 1.0 1.0"/>
+            <site name="obj" pos="0 0 0" size="0.03" rgba="0.0 0.0 1.0 1.0"/>
         </body>
 
-        <body name="obj2" pos="0 0 0.1">
+        <body name="obj1" pos=".5 0 0.1">
+            <joint name="objjoint1" type="free" limited='false' damping="0" armature="0" />
+            <inertial pos="0 0 0" mass=".1" diaginertia="10000 10000 10000"/>
+            <geom name="objbox1" type="box" pos="0 0 0"
+                  size=".010 .01 .01" rgba=".1 .1 .9 1"
+                  contype="7" conaffinity="7" friction="1.0 0.10 0.002" condim="4" mass=1.0/>
+                <body name="obj_T1" pos="0.0 0.0 0.01" >
+                    <geom
+                     name="T_obj1" condim="4" contype="2" conaffinity="2" class="1" mass="0.08" type="box" pos="0 0 0" size="0.012 0.012 0.001" rgba="0.0 0.0 1.0 1.0" friction="1 0.05 0.01"/>
+                </body>
+
+            <site name="obj1" pos="0 0 0" size="0.03" rgba="0.0 0.0 1.0 1.0"/>
+        </body>
+
+        <body name="obj2" pos="1.5 0 0.1">
             <joint name="objjoint2" type="free" limited='false' damping="0" armature="0" />
             <inertial pos="0 0 0" mass=".1" diaginertia="10000 10000 10000"/>
             <geom name="objbox2" type="box" pos="0 0 0"
@@ -28,21 +42,7 @@
                      name="T_obj2" condim="4" contype="2" conaffinity="2" class="1" mass="0.08" type="box" pos="0 0 0" size="0.012 0.012 0.001" rgba="0.0 0.0 1.0 1.0" friction="1 0.05 0.01"/>
                 </body>
 
-            <site name="obj2" pos="0 0 0" size="0.035" rgba="0.0 0.0 1.0 1.0"/>
-        </body>
-
-        <body name="obj3" pos="0 0 0.1">
-            <joint name="objjoint3" type="free" limited='false' damping="0" armature="0" />
-            <inertial pos="0 0 0" mass=".1" diaginertia="10000 10000 10000"/>
-            <geom name="objbox3" type="box" pos="0 0 0"
-                  size=".010 .01 .01" rgba=".1 .1 .9 1"
-                  contype="7" conaffinity="7" friction="1.0 0.10 0.002" condim="4" mass=1.0/>
-                <body name="obj_T3" pos="0.0 0.0 0.01" >
-                    <geom
-                     name="T_obj3" condim="4" contype="2" conaffinity="2" class="1" mass="0.08" type="box" pos="0 0 0" size="0.012 0.012 0.001" rgba="0.0 0.0 1.0 1.0" friction="1 0.05 0.01"/>
-                </body>
-
-            <site name="obj3" pos="0 0 0" size="0.035" rgba="0.0 0.0 1.0 1.0"/>
+            <site name="obj2" pos="0 0 0" size="0.03" rgba="0.0 0.0 1.0 1.0"/>
         </body>
 
 
@@ -52,6 +52,6 @@
               rgba="0.5 0.5 1 0.5"/>
     </worldbody>
     <actuator>
-        <motor gear="1000" joint="rc_close"  />
+        <motor gear="100" joint="rc_close"  />
     </actuator>
 </mujoco>
