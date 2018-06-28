@@ -18,7 +18,7 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
             reward_type='hand_and_obj_distance',
             indicator_threshold=0.06,
 
-            obj_init_pos=(0, 0.6, 0.02),
+            obj_init_pos=(0, 0.6, 0.03),
 
             fix_goal=False,
             fixed_goal=(0.15, 0.6, 0.055, -0.15, 0.6),
@@ -214,7 +214,7 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
             'state_desired_goal': self._state_goal,
         }
 
-    def sample_goals(self, batch_size, p_obj_in_hand=0.9):
+    def sample_goals(self, batch_size, p_obj_in_hand=.75):
         if self.fix_goal:
             goals = np.repeat(
                 self.fixed_goal.copy()[None],
@@ -232,8 +232,8 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
             num_objs_in_hand = int(np.random.random() < p_obj_in_hand)
         # Put object in hand
         goals[:num_objs_in_hand, 3:] = goals[:num_objs_in_hand, :3].copy()
-        goals[:num_objs_in_hand, 4] -= 0.01
-        goals[:num_objs_in_hand, 5] += 0.00
+        goals[:num_objs_in_hand, 4] -= 0.02
+        goals[:num_objs_in_hand, 5] += 0.02
 
         # Put object one the table (not floating)
         goals[num_objs_in_hand:, 5] = self.obj_init_pos[2]
@@ -369,9 +369,9 @@ class SawyerPickAndPlaceEnvYZ(SawyerPickAndPlaceEnv):
         return np.r_[adjust_x, action]
 
     def step(self, action):
-        new_obj_pos = self.data.get_site_xpos('obj')
-        new_obj_pos[0] = self.x_axis
-        self._set_obj_xyz(new_obj_pos)
+        # new_obj_pos = self.data.get_site_xpos('obj')
+        # new_obj_pos[0] = self.x_axis
+        # self._set_obj_xyz(new_obj_pos)
 
         action = self.convert_2d_action(action)
         return super().step(action)
@@ -415,11 +415,11 @@ class SawyerPickAndPlaceEnvYZ(SawyerPickAndPlaceEnv):
         corrected_obj_pos[2] = max(corrected_obj_pos[2], self.obj_init_pos[2])
         self._set_obj_xyz(corrected_obj_pos)
         action = np.array(1 - 2 * (np.random.random() > .7))
-        for _ in range(3):
-            self.do_simulation(action)
+        self.do_simulation(action)
+        self.render()
         new_obj_pos = self.data.get_site_xpos('obj')
-        new_obj_pos[0] = self.x_axis
-        self._set_obj_xyz(new_obj_pos)
+#        new_obj_pos[0] = self.x_axis
+#        self._set_obj_xyz(new_obj_pos)
         self.sim.forward()
 
 

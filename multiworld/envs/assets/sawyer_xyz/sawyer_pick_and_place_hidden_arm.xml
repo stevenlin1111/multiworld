@@ -5,11 +5,15 @@
         <include file="sawyer_xyz_base_hidden_arm.xml"></include>
         <body name="obj" pos="0 0 0.1">
             <joint name="objjoint" type="free" limited='false' damping="0" armature="0" />
-            <inertial pos="0 0 0" mass=".1" diaginertia="100000 100000 100000"/>
-            <geom name="objbox" type="sphere" pos="0 0 0"
-                  size=".015" rgba=".1 .1 .9 1"
-                  contype="7" conaffinity="7" friction="1.0 0.10 0.002" condim="4" mass=1.0
-            />
+            <inertial pos="0 0 0" mass=".1" diaginertia="10000 10000 10000"/>
+            <geom name="objbox" type="box" pos="0 0 0"
+                  size=".010 .01 .01" rgba=".1 .1 .9 1"
+                  contype="7" conaffinity="7" friction="1.0 0.10 0.002" condim="4" mass=1.0/>
+                <body name="obj_T" pos="0.0 0.0 0.01" >
+                    <geom
+                     name="T_obj" condim="4" contype="2" conaffinity="2" class="1" mass="0.08" type="box" pos="0 0 0" size="0.012 0.012 0.001" rgba="0.0 0.0 1.0 1.0" friction="1 0.05 0.01"/>
+                </body>
+
             <site name="obj" pos="0 0 0" size="0.035" rgba="0.0 0.0 1.0 1.0"/>
         </body>
 

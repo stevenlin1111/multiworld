@@ -62,6 +62,6 @@ def sawyer_pick_and_place_camera(camera):
     camera.lookat[1] = .67
     camera.lookat[2] = .1
     camera.distance = .6
-    camera.elevation = 0
+    camera.elevation = -5
     camera.azimuth = 180
     camera.trackbodyid = 0
