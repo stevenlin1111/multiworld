@@ -68,11 +68,15 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
             np.hstack((self.hand_low, obj_low)),
             np.hstack((self.hand_high, obj_high)),
         )
+        self.gripper_and_hand_and_obj_space = Box(
+            np.hstack(([0.0], self.hand_low, obj_low)),
+            np.hstack(([0.04], self.hand_high, obj_high)),
+        )
         self.observation_space = Dict([
-            ('observation', self.hand_and_obj_space),
+            ('observation', self.gripper_and_hand_and_obj_space),
             ('desired_goal', self.hand_and_obj_space),
             ('achieved_goal', self.hand_and_obj_space),
-            ('state_observation', self.hand_and_obj_space),
+            ('state_observation', self.gripper_and_hand_and_obj_space),
             ('state_desired_goal', self.hand_and_obj_space),
             ('state_achieved_goal', self.hand_and_obj_space),
         ])
@@ -109,10 +113,12 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
     def _get_obs(self):
         e = self.get_endeff_pos()
         b = self.get_obj_pos()
+        gripper = self.get_gripper_pos()
         flat_obs = np.concatenate((e, b))
+        flat_obs_with_gripper = np.concatenate((gripper, e, b))
 
         return dict(
-            observation=flat_obs,
+            observation=flat_obs_with_gripper,
             desired_goal=self._state_goal,
             achieved_goal=flat_obs,
             state_observation=flat_obs,
@@ -334,15 +340,21 @@ class SawyerPickAndPlaceEnvYZ(SawyerPickAndPlaceEnv):
             self.hand_and_obj_space.low[3:],
             self.hand_and_obj_space.high[:3],
             self.hand_and_obj_space.high[3:],
+
+            self.gripper_and_hand_and_obj_space.low[1:4],
+            self.gripper_and_hand_and_obj_space.low[4:],
+            self.gripper_and_hand_and_obj_space.high[1:4],
+            self.gripper_and_hand_and_obj_space.high[4:],
+
         ]
         for pos in pos_arrays:
             pos[0] = x_axis
 
         self.observation_space = Dict([
-            ('observation', self.hand_and_obj_space),
+            ('observation', self.gripper_and_hand_and_obj_space),
             ('desired_goal', self.hand_and_obj_space),
             ('achieved_goal', self.hand_and_obj_space),
-            ('state_observation', self.hand_and_obj_space),
+            ('state_observation', self.gripper_and_hand_and_obj_space),
             ('state_desired_goal', self.hand_and_obj_space),
             ('state_achieved_goal', self.hand_and_obj_space),
         ])
