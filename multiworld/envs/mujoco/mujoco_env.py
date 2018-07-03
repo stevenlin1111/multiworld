@@ -19,7 +19,7 @@ class MujocoEnv(gym.Env):
     Some differences are:
      - Do not automatically set the observation/action space.
     """
-    def __init__(self, model_path, frame_skip, automatically_set_spaces=False):
+    def __init__(self, model_path, frame_skip, automatically_set_spaces=False, offscreen=False):
         if model_path.startswith("/"):
             fullpath = model_path
         else:
@@ -31,6 +31,7 @@ class MujocoEnv(gym.Env):
         self.sim = mujoco_py.MjSim(self.model)
         self.data = self.sim.data
         self.viewer = None
+        self.offscreen = offscreen
 
         self.metadata = {
             'render.modes': ['human', 'rgb_array'],
@@ -139,14 +140,23 @@ class MujocoEnv(gym.Env):
         ])
 
     def get_image(self, width=84, height=84, camera_name=None):
-        return self.sim.render(
-            width=width,
-            height=height,
-            camera_name=camera_name,
-        )
+        if self.offscreen:
+            return self.sim.render(
+                mode='offscreen',
+                width=width,
+                height=height,
+                camera_name=camera_name,
+            )
+        else:
+            data = self._get_viewer().read_pixels(width, height, depth=False)
+            return data[::-1, :, :]
 
     def initialize_camera(self, init_fctn):
         sim = self.sim
-        viewer = mujoco_py.MjRenderContextOffscreen(sim, device_id=-1)
-        init_fctn(viewer.cam)
-        sim.add_render_context(viewer)
+        def init_camera(viewer):
+            init_fctn(viewer.cam)
+            sim.add_render_context(viewer)
+        if self.offscreen:
+            init_camera(mujoco_py.MjRenderContextOffscreen(sim, device_id=-1))
+        else:
+            init_camera(mujoco_py.MjRenderContextWindow(sim))
