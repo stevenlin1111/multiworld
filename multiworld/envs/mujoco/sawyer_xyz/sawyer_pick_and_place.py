@@ -241,7 +241,7 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
         # Put object in hand
         goals[:num_objs_in_hand, 3:] = goals[:num_objs_in_hand, :3].copy()
         goals[:num_objs_in_hand, 4] -= 0.01
-        goals[:num_objs_in_hand, 5] += 0.00
+        goals[:num_objs_in_hand, 5] += 0.01
 
         # Put object one the table (not floating)
         goals[num_objs_in_hand:, 5] = self.obj_init_z
@@ -427,11 +427,11 @@ class SawyerPickAndPlaceEnvYZ(SawyerPickAndPlaceEnv):
         corrected_obj_pos[2] = max(corrected_obj_pos[2], self.obj_init_z)
         self._set_obj_xyz(corrected_obj_pos)
         action = np.array(1 - 2 * (np.random.random() > .7))
-        for _ in range(3):
+        for _ in range(10):
             self.do_simulation(action)
-        new_obj_pos = self.data.get_site_xpos('obj')
-        new_obj_pos[0] = self.x_axis
-        self._set_obj_xyz(new_obj_pos)
+        # new_obj_pos = self.data.get_site_xpos('obj')
+        # new_obj_pos[0] = self.x_axis
+        # self._set_obj_xyz(new_obj_pos)
         self.sim.forward()
 
 
