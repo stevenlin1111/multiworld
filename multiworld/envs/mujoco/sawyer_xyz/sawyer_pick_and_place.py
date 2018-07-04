@@ -262,6 +262,7 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
         obj_distances = np.linalg.norm(obj_goals - obj_pos, axis=1)
         hand_and_obj_distances = hand_distances + obj_distances
         touch_distances = np.linalg.norm(hand_pos - obj_pos, axis=1)
+        touch_and_obj_distances = touch_distances + obj_distances
 
         if self.reward_type == 'hand_distance':
             r = -hand_distances
@@ -273,6 +274,8 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
             r = -(obj_distances < self.indicator_threshold).astype(float)
         elif self.reward_type == 'hand_and_obj_distance':
             r = -hand_and_obj_distances
+        elif self.reward_type == 'touch_and_obj_distance':
+            r = -touch_and_obj_distances
         elif self.reward_type == 'hand_and_obj_success':
             r = -(
                 hand_and_obj_distances < self.indicator_threshold
