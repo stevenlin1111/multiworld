@@ -63,10 +63,10 @@ def init_sawyer_camera_v4(camera):
     This is the same camera used in old experiments (circa 6/7/2018)
     """
     camera.lookat[0] = 0
-    camera.lookat[1] = 0.65
+    camera.lookat[1] = 0.85
     camera.lookat[2] = 0.3
-    camera.distance = 0.6
-    camera.elevation = -65
+    camera.distance = 0.3
+    camera.elevation = -35
     camera.azimuth = 270
     camera.trackbodyid = -1
 
@@ -93,7 +93,7 @@ def push_camera(camera):
     #cam_pos = np.array([0, 0.5, 0.2, cam_dist, -45, rotation_angle])
 
     # 3rd person view
-    cam_dist = 0.4
+    cam_dist = 0.3
     rotation_angle = 270
     cam_pos = np.array([0, 0.85, 0.2, cam_dist, -45, rotation_angle])
 

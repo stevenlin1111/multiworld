@@ -40,6 +40,10 @@ class SawyerPushAndReachXYZEnv(MultitaskEnv, SawyerXYZEnv):
             puck_low = self.hand_low[:2]
         if puck_high is None:
             puck_high = self.hand_high[:2]
+        # ew
+        self.hand_low = np.array([-.05, .55, 0])
+        self.hand_high = np.array([.05, .65, 0])
+
         puck_low = np.array(puck_low)
         puck_high = np.array(puck_high)
 
@@ -345,20 +349,20 @@ class SawyerPushAndReachXYZEnv(MultitaskEnv, SawyerXYZEnv):
         statistics = OrderedDict()
         for stat_name in [
             'hand_distance',
-            'hand_distance_l1',
-            'hand_distance_l2',
+            #'hand_distance_l1',
+            #'hand_distance_l2',
             'puck_distance',
-            'puck_distance_l1',
-            'puck_distance_l2',
+            #'puck_distance_l1',
+            #'puck_distance_l2',
             'hand_and_puck_distance',
-            'hand_and_puck_distance_l1',
-            'hand_and_puck_distance_l2',
+            #'hand_and_puck_distance_l1',
+            #'hand_and_puck_distance_l2',
             'state_distance',
-            'state_distance_l1',
-            'state_distance_l2',
+            #'state_distance_l1',
+            #'state_distance_l2',
             'touch_distance',
-            'touch_distance_l1',
-            'touch_distance_l2',
+            #'touch_distance_l1',
+            #'touch_distance_l2',
             'hand_success',
             'puck_success',
             'hand_and_puck_success',
@@ -396,6 +400,8 @@ class SawyerPushAndReachXYEnv(SawyerPushAndReachXYZEnv):
         self.quick_init(locals())
         SawyerPushAndReachXYZEnv.__init__(self, *args, **kwargs)
         self.hand_z_position = hand_z_position
+        self.goal_low[2] = hand_z_position
+        self.goal_high[2] = hand_z_position
         self.action_space = Box(np.array([-1, -1]), np.array([1, 1]))
         self.fixed_goal[2] = hand_z_position
         hand_and_puck_low = self.hand_and_puck_space.low.copy()
