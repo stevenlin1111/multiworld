@@ -139,11 +139,14 @@ class MujocoEnv(gym.Env):
         ])
 
     def get_image(self, width=84, height=84, camera_name=None):
-        return self.sim.render(
+        res = self.sim.render(
             width=width,
             height=height,
             camera_name=camera_name,
+            depth=True,
         )
+        import pdb; pdb.set_trace()
+        return res
 
     def initialize_camera(self, init_fctn):
         sim = self.sim
