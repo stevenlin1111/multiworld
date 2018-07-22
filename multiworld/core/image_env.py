@@ -16,6 +16,7 @@ class ImageEnv(ProxyEnv):
             transpose=False,
             grayscale=False,
             normalize=False,
+            depth=False,
             reward_type='wrapped_env',
             threshold=10,
     ):
@@ -27,13 +28,15 @@ class ImageEnv(ProxyEnv):
         self.transpose = transpose
         self.grayscale = grayscale
         self.normalize = normalize
+        self.depth = depth
 
         if grayscale:
             self.image_length = self.imsize * self.imsize
         else:
             self.image_length = 3 * self.imsize * self.imsize
-        # This is torch format rather than PIL image
-        self.image_shape = (self.imsize, self.imsize)
+
+        if self.depth:
+            self.image_length += self.imsize * self.imsize
         # Flattened past image queue
         # init camera
         if init_camera is not None:
@@ -82,7 +85,11 @@ class ImageEnv(ProxyEnv):
 
     def _get_flat_img(self):
         # returns the image as a torch format np array
-        image_obs = self._wrapped_env.get_image()
+        image_obs = self._wrapped_env.get_image(depth=self.depth)
+        # for now assume normalize
+        if self.depth:
+            depth = image_obs[1]
+            image_obs = image_obs[0]
         if self._render_local:
             cv2.imshow('env', image_obs)
             cv2.waitKey(1)
@@ -93,6 +100,12 @@ class ImageEnv(ProxyEnv):
             image_obs = image_obs / 255.0
         if self.transpose:
             image_obs = image_obs.transpose()
+        if self.depth:
+            depth = unormalize_image(depth).reshape(self.imsize, self.imsize, 1)
+            image_obs = np.concatenate(
+                (image_obs, depth)
+                , axis=2
+            )
         return image_obs.flatten()
 
     def enable_render(self):

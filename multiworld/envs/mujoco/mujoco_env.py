@@ -138,14 +138,13 @@ class MujocoEnv(gym.Env):
             self.sim.data.qvel.flat
         ])
 
-    def get_image(self, width=84, height=84, camera_name=None):
+    def get_image(self, width=84, height=84, depth=False, camera_name=None):
         res = self.sim.render(
             width=width,
             height=height,
             camera_name=camera_name,
-            depth=True,
+            depth=depth,
         )
-        import pdb; pdb.set_trace()
         return res
 
     def initialize_camera(self, init_fctn):
