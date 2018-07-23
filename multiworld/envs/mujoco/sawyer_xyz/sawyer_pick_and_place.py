@@ -58,6 +58,7 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
 
         self.obj_init_z = obj_init_positions[0][2]
         self.obj_init_positions = np.array(obj_init_positions)
+        self.last_obj_pos = self.obj_init_positions[0]
 
         self.fix_goal = fix_goal
         self.fixed_goal = np.array(fixed_goal)
@@ -189,7 +190,7 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
         self._reset_hand()
         self._set_goal_marker(self._state_goal)
         if self.reset_free:
-            self.set_obj_xyz(self.last_obj_pos)
+            self._set_obj_xyz(self.last_obj_pos)
             return self._get_obs()
 
         if self.random_init:
@@ -364,7 +365,6 @@ class SawyerPickAndPlaceEnvYZ(SawyerPickAndPlaceEnv):
         self,
         x_axis=0.0,
         oracle_reset_prob=0.0,
-        reset_free=False,
         *args,
         **kwargs
     ):
@@ -426,7 +426,7 @@ class SawyerPickAndPlaceEnvYZ(SawyerPickAndPlaceEnv):
         if for_vae and new_obj_pos[2] > .05:
             action[2] = 1.0
         self._set_obj_xyz(new_obj_pos)
-        self.last_obj_pos = new_obj_pos
+        self.last_obj_pos = new_obj_pos.copy()
         action = self.convert_2d_action(action)
         return super().step(action)
 
