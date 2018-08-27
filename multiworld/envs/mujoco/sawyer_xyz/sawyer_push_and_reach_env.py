@@ -109,8 +109,7 @@ class SawyerPushAndReachXYZEnv(MultitaskEnv, SawyerXYZEnv):
 
     def step(self, action):
         self.set_xyz_action(action)
-        u = np.zeros(7)
-        self.do_simulation(u)
+        self.do_simulation(np.array([1]))
         self._set_goal_marker(self._state_goal)
         ob = self._get_obs()
         reward = self.compute_reward(action, ob)

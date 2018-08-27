@@ -212,13 +212,10 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
 
     def reset_model(self):
         self._reset_hand()
+
         if self.reset_free:
             self._set_obj_xyz(self.last_obj_pos)
-            self.set_goal(self.sample_goal())
-            self._set_goal_marker(self._state_goal)
-            return self._get_obs()
-
-        if self.random_init:
+        elif self.random_init:
             goal = np.random.uniform(
                 self.hand_and_obj_space.low[3:],
                 self.hand_and_obj_space.high[3:],

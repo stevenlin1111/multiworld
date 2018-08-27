@@ -141,14 +141,21 @@ class MujocoEnv(gym.Env):
         ])
 
     def get_image(self, width=84, height=84, camera_name=None):
-        return self.sim.render(
-            width=width,
-            height=height,
-            camera_name=camera_name,
-        )
+        images = []
+        for init_camera in self.init_camera_fctns:
+            init_camera(self.offscreen_viewer.cam)
+            image = self.sim.render(
+                width=width,
+                height=height,
+                camera_name=camera_name,
+            )
+            images.append(image)
+        return np.concatenate(images, axis=2)
 
-    def initialize_camera(self, init_fctn):
+    def initialize_camera(self, init_fctns):
+        self.init_camera_fctns = init_fctns
         sim = self.sim
-        viewer = mujoco_py.MjRenderContextOffscreen(sim, device_id=self.device_id)
-        init_fctn(viewer.cam)
-        sim.add_render_context(viewer)
+        self.offscreen_viewer = \
+                mujoco_py.MjRenderContextOffscreen(sim, device_id=self.device_id)
+        init_fctns[0](self.offscreen_viewer.cam)
+        sim.add_render_context(self.offscreen_viewer)

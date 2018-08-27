@@ -36,13 +36,19 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
         self.grayscale = grayscale
         self.normalize = normalize
 
+        if type(init_camera) == list:
+            num_images = len(init_camera)
+        else:
+            init_camera = [init_camera]
+            num_images = 1
+
         if image_length is not None:
             self.image_length = image_length
         else:
             if grayscale:
-                self.image_length = self.imsize * self.imsize
+                self.image_length = num_images * self.imsize * self.imsize
             else:
-                self.image_length = 3 * self.imsize * self.imsize
+                self.image_length = 3 * num_images * self.imsize * self.imsize
         self.channels = 1 if grayscale else 3
 
         # This is torch format rather than PIL image
