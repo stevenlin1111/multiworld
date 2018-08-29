@@ -211,7 +211,10 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
         self.set_state(qpos, qvel)
 
     def reset_model(self):
-        self._reset_hand()
+        if not self.reset_free:
+            self._reset_hand()
+        else:
+            self.do_simulation(np.array([-1]))
 
         if self.reset_free:
             self._set_obj_xyz(self.last_obj_pos)

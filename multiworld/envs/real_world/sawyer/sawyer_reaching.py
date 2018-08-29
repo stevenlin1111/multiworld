@@ -6,9 +6,10 @@ from multiworld.core.serializable import Serializable
 from gym.spaces import Dict
 
 class SawyerReachXYZEnv(sawyer_reaching.SawyerReachXYZEnv, MultitaskEnv):
-    def __init__(self,
-                 **kwargs
-                 ):
+    def __init__(
+        self,
+        **kwargs
+    ):
         Serializable.quick_init(self, locals())
         super().__init__(self, **kwargs)
         self.observation_space = Dict([

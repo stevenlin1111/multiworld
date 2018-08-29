@@ -83,7 +83,7 @@ def sawyer_pick_and_place_camera_slanted_angle(camera):
     camera.lookat[1] = .67
     camera.lookat[2] = .1
     camera.distance = .65
-    camera.elevation = -37.85
+    camera.elevation = -60
     camera.azimuth = 180
     camera.trackbodyid = 0
 
