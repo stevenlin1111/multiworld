@@ -150,9 +150,14 @@ class MujocoEnv(gym.Env):
                 camera_name=camera_name,
             )
             images.append(image)
+        # images[1] = images[1][5:35, 5:35, :]
+        # import scipy.misc
+        # images[1] = scipy.misc.imresize(images[1], (width, height, 3))
         return np.concatenate(images, axis=2)
 
     def initialize_camera(self, init_fctns):
+        if type(init_fctns) != list:
+            init_fctns = [init_fctns]
         self.init_camera_fctns = init_fctns
         sim = self.sim
         self.offscreen_viewer = \
