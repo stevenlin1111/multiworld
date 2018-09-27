@@ -210,13 +210,21 @@ class SawyerPickAndPlaceEnv(MultitaskEnv, SawyerXYZEnv):
         qvel[8:15] = 0
         self.set_state(qpos, qvel)
 
+    def reset(self):
+        # self.sim.reset()
+        ob = self.reset_model()
+        if self.viewer is not None:
+            self.viewer_setup()
+        return ob
+
     def reset_model(self):
-        if not self.reset_free:
-            self._reset_hand()
-        else:
+        if self.reset_free:
             self.do_simulation(np.array([-1]))
+        else:
+            self._reset_hand()
 
         if self.reset_free:
+            self.last_obj_pos[2] = self.obj_init_z
             self._set_obj_xyz(self.last_obj_pos)
         elif self.random_init:
             goal = np.random.uniform(
