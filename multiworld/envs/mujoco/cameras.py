@@ -176,6 +176,23 @@ def sawyer_pusher_camera_top_down(camera):
     camera.azimuth = cam_pos[5]
     camera.trackbodyid = -1
 
+def sawyer_door_side_camera(camera):
+    # -0.199165796861 0.579504471951 0.331416868819 1.141999569051058 -19.74293059125965 -0.6940874035989693
+    camera.lookat[0] = -.2
+    camera.lookat[1] = .58
+    camera.lookat[2] = .33
+    camera.distance = 1.14
+    camera.elevation = -19.74
+
+def sawyer_door_angled_camera(camera):
+    #-0.318599359444 0.611850100287 0.230596331934 0.5985720207596054 -22.056555269922885 58.071979434447336
+    camera.lookat[0] = -.32
+    camera.lookat[1] = .61
+    camera.lookat[2] = .23
+    camera.distance = .6
+    camera.elevation = -12
+
+
 def sawyer_init_camera_zoomed_in(camera):
     camera.trackbodyid = 0
     camera.distance = 1.0
