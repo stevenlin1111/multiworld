@@ -140,16 +140,29 @@ class MujocoEnv(gym.Env):
             self.sim.data.qvel.flat
         ])
 
-    def get_image(self, width=84, height=84, camera_name=None):
-        return self.sim.render(
-            width=width,
-            height=height,
-            camera_name=camera_name,
+    def get_image(self, width=84, height=84, camera_name=None, init_cam=None):
+        if not init_cam:
+            return self.sim.render(
+                width=width,
+                height=height,
+                camera_name=camera_name,
+            )
+        # self.initialize_camera(init_cam)
+        init_cam(self.offscreen_viewer.cam)
+        img = self.sim.render(
+                width=width,
+                height=height,
+                camera_name=camera_name,
         )
+        self.init_camera_fctn(self.offscreen_viewer.cam)
+        return img
+
 
     def initialize_camera(self, init_fctn):
+        self.init_camera_fctn = init_fctn
         sim = self.sim
         viewer = mujoco_py.MjRenderContextOffscreen(sim, device_id=self.device_id)
+        self.offscreen_viewer = viewer
         # viewer = mujoco_py.MjViewer(sim)
         init_fctn(viewer.cam)
         sim.add_render_context(viewer)

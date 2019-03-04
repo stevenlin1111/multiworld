@@ -10,6 +10,7 @@ from multiworld.core.multitask_env import MultitaskEnv
 from multiworld.core.wrapper_env import ProxyEnv
 from multiworld.envs.env_util import concatenate_box_spaces
 from multiworld.envs.env_util import get_stat_in_paths, create_stats_ordered_dict
+from multiworld.envs.mujoco.cameras import *
 
 
 class ImageEnv(ProxyEnv, MultitaskEnv):
@@ -27,7 +28,7 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
             presampled_goals=None,
             non_presampled_goal_img_is_garbage=False,
             recompute_reward=True,
-            high_res_size=600,
+            high_res_size=300,
     ):
         """
 
@@ -116,6 +117,24 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
             self.num_goals_presampled = 0
         else:
             self.num_goals_presampled = presampled_goals[random.choice(list(presampled_goals))].shape[0]
+        self.high_res_angles = [
+            # door options
+            # lambda cam: sawyer_init_camera_var(cam, -0.159735848123 ,  0.414153682063 ,  0.325590925892 ,  -22.394904458598706 ,  46.08917197452234 ,  1.4067776341781969),
+            ## lambda cam: sawyer_init_camera_var(cam, 0.00672842843406 ,  0.390678700926 ,  0.254667429664 ,  -24.687898089172002 ,  53.65605095541399 ,  1.3406488922400057),
+            ## lambda cam: sawyer_init_camera_var(cam, -0.158597223757 ,  0.557464307886 ,  0.151934562785 ,  -28.58598726114652 ,  122.90445859872614 ,  1.6120852509907324),
+            ## lambda cam: sawyer_init_camera_var(cam, -0.167619195085 ,  0.568209694024 ,  0.257788514346 ,  -18.726114649681534 ,  119.69426751592361 ,  1.682650578356402),
+
+            # pickup options
+            # sawyer_pick_and_place_camera,
+            # pusher options
+            # lambda cam: sawyer_init_camera_var(cam, -0.00943560821979 ,  0.999796224591 ,  0.313897277062 ,  -8.218390804597675 ,  -88.85057471264368 ,  0.6846279290419606),
+            # lambda cam: sawyer_init_camera_var(cam, -0.00943560821979 ,  0.999796224591 ,  0.313897277062 ,  -8.218390804597675 ,  -88.85057471264368 ,  0.3346279290419606),
+            # lambda cam: sawyer_init_camera_var(cam, -0.00943560821979 ,  0.999796224591 ,  0.263897277062 ,  -8.218390804597675 ,  -88.85057471264368 ,  0.6846279290419606),
+            # lambda cam: sawyer_init_camera_var(cam, -0.00943560821979 ,  0.999796224591 ,  0.263897277062 ,  -8.218390804597675 ,  -88.85057471264368 ,  0.2846279290419606),
+            # lambda cam: sawyer_init_camera_var(cam, 0.0287171488113 ,  0.810057629875 ,  0.631002715625 ,  -52.21839080459769 ,  -89.7701149425287 ,  0.6608392981473316),
+            lambda cam: sawyer_init_camera_var(cam, 0.0287171488113 ,  0.810057629875 ,  0.631002715625 ,  -52.21839080459769 ,  -89.7701149425287 ,  0.4608392981473316),
+            # lambda cam: sawyer_init_camera_var(cam, -0.00102935729612 ,  0.666701432736 ,  0.648482191935 ,  -70.60919540229885 ,  -89.99999999999996 ,  0.6608392981473316),
+        ]
 
     def step(self, action):
         obs, reward, done, info = self.wrapped_env.step(action)
@@ -160,11 +179,14 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
         return self._update_obs(self.wrapped_env._get_obs())
 
     def _update_obs(self, obs, debug=False):
-
         img_obs = self._get_flat_img()
-        high_res_img_obs = self._get_flat_img(imsize=(self.high_res_size, self.high_res_size))
+        for idx, angle in enumerate(self.high_res_angles):
+            high_res_img_obs = self._get_flat_img(
+                imsize=(self.high_res_size, self.high_res_size),
+                init_cam=angle
+            )
+            obs['high_res_image_observation' + str(idx)] = high_res_img_obs
         obs['image_observation'] = img_obs
-        obs['high_res_image_observation'] = high_res_img_obs
         obs['high_res_image_desired_goal'] = self._high_res_img_goal
         obs['image_desired_goal'] = self._img_goal
         obs['image_achieved_goal'] = img_obs
@@ -191,16 +213,16 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
             obs['image_proprio_achieved_goal'] = np.concatenate(
                 (obs['image_achieved_goal'], obs['proprio_achieved_goal'])
             )
-
         return obs
 
-    def _get_flat_img(self, imsize=None):
+    def _get_flat_img(self, imsize=None, **kwargs):
         if imsize is None:
             imsize = (self.imsize, self.imsize)
         # returns the image as a torch format np array
         image_obs = self._wrapped_env.get_image(
             width=imsize[0],
             height=imsize[1],
+            **kwargs
         )
         if self._render_local:
             cv2.imshow('env', image_obs)
