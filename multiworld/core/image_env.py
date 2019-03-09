@@ -28,7 +28,7 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
             presampled_goals=None,
             non_presampled_goal_img_is_garbage=False,
             recompute_reward=True,
-            high_res_size=300,
+            high_res_size=600,
     ):
         """
 
@@ -125,16 +125,14 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
             ## lambda cam: sawyer_init_camera_var(cam, -0.167619195085 ,  0.568209694024 ,  0.257788514346 ,  -18.726114649681534 ,  119.69426751592361 ,  1.682650578356402),
 
             # pickup options
-            # sawyer_pick_and_place_camera,
+            sawyer_pick_and_place_camera,
             # pusher options
-            # lambda cam: sawyer_init_camera_var(cam, -0.00943560821979 ,  0.999796224591 ,  0.313897277062 ,  -8.218390804597675 ,  -88.85057471264368 ,  0.6846279290419606),
-            # lambda cam: sawyer_init_camera_var(cam, -0.00943560821979 ,  0.999796224591 ,  0.313897277062 ,  -8.218390804597675 ,  -88.85057471264368 ,  0.3346279290419606),
-            # lambda cam: sawyer_init_camera_var(cam, -0.00943560821979 ,  0.999796224591 ,  0.263897277062 ,  -8.218390804597675 ,  -88.85057471264368 ,  0.6846279290419606),
-            # lambda cam: sawyer_init_camera_var(cam, -0.00943560821979 ,  0.999796224591 ,  0.263897277062 ,  -8.218390804597675 ,  -88.85057471264368 ,  0.2846279290419606),
-            # lambda cam: sawyer_init_camera_var(cam, 0.0287171488113 ,  0.810057629875 ,  0.631002715625 ,  -52.21839080459769 ,  -89.7701149425287 ,  0.6608392981473316),
-            lambda cam: sawyer_init_camera_var(cam, 0.0287171488113 ,  0.810057629875 ,  0.631002715625 ,  -52.21839080459769 ,  -89.7701149425287 ,  0.4608392981473316),
-            # lambda cam: sawyer_init_camera_var(cam, -0.00102935729612 ,  0.666701432736 ,  0.648482191935 ,  -70.60919540229885 ,  -89.99999999999996 ,  0.6608392981473316),
+            # lambda cam: sawyer_init_camera_var(cam, 0.0287171488113 ,  0.810057629875 ,  0.631002715625 ,  -52.21839080459769 ,  -89.7701149425287 ,  0.4608392981473316),
+            # sawyer_door_env_camera_v0
+            # sawyer_init_camera_zoomed_in
         ]
+        self.goal_idx = None
+        self._high_res_img_goal = None
 
     def step(self, action):
         obs, reward, done, info = self.wrapped_env.step(action)
@@ -152,8 +150,9 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
         info['image_dist'] = image_dist
         info['image_success'] = image_success
 
-    def reset(self):
+    def reset(self, goal_idx=None):
         obs = self.wrapped_env.reset()
+        self.goal_idx = goal_idx
         if self.num_goals_presampled > 0:
             goal = self.sample_goal()
             self._img_goal = goal['image_desired_goal']
@@ -172,7 +171,6 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
             self._img_goal = self._get_flat_img()
             self._high_res_img_goal = self._get_flat_img(imsize=(self.high_res_size, self.high_res_size))
             self.wrapped_env.set_env_state(env_state)
-
         return self._update_obs(obs, debug=True)
 
     def _get_obs(self):
@@ -259,6 +257,9 @@ class ImageEnv(ProxyEnv, MultitaskEnv):
     def sample_goals(self, batch_size):
         if self.num_goals_presampled > 0:
             idx = np.random.randint(0, self.num_goals_presampled, batch_size)
+            if batch_size == 1 and self.goal_idx is not None:
+                idx = np.array([self.goal_idx])
+                print(idx)
             sampled_goals = {
                 k: v[idx] for k, v in self._presampled_goals.items()
             }

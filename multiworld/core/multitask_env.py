@@ -80,7 +80,8 @@ class MultitaskEnv(gym.Env, metaclass=abc.ABCMeta):
         """
         new_d = {}
         for k in batch_dict.keys():
-            new_d[k] = batch_dict[k][i]
+            if batch_dict[k] is not None:
+                new_d[k] = batch_dict[k][i]
         return new_d
 
     @staticmethod
