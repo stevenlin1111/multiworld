@@ -90,6 +90,26 @@ def register_pygame_envs():
             'render_target': True,
         },
     )
+    import numpy as np
+    register(
+        id='Point2D-Maze-v1',
+        entry_point='multiworld.envs.pygame.point2d:Point2DBlockEnv',
+        tags={
+            'git-commit-hash': '73c8823',
+            'author': 'steven'
+        },
+        kwargs={
+            'action_scale': 1,
+            'block_matrix': np.load("/Users/steven/Downloads/maze.npy"),
+            'render_size': 400,
+            'images_are_rgb': True,
+            'render_onscreen': True,
+            'render_target': True,
+            'target_radius': 0.25,
+            'ball_radius': 0.25,
+        },
+    )
+
     register(
         id='Point2DEnv-ImageFixedGoal-v0',
         entry_point=point2d_image_fixed_goal_v0,

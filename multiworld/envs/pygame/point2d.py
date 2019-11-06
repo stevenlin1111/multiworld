@@ -569,6 +569,34 @@ class Point2DWallEnv(Point2DEnv):
         if wall_shape == "none":
             self.walls = []
 
+class Point2DBlockEnv(Point2DEnv):
+    def __init__(self, block_matrix, *args, **kwargs):
+        self.quick_init(locals())
+        super().__init__(*args, **kwargs)
+        self.walls = []
+        scale_factor = self.boundary_dist * 2 / len(block_matrix)
+        self.inner_wall_max_dist = 1
+        self.wall_thickness = 0.5
+        for row_idx, row in enumerate(block_matrix):
+            for col_idx, val in enumerate(row):
+                if val:
+                    print(row_idx, col_idx)
+                    # Because the window is (-boundary_dist, boundary_dist)
+                    # instead of (0, 2 * boundary_dist)
+                    y = -self.boundary_dist + row_idx * scale_factor
+                    x = -self.boundary_dist + col_idx * scale_factor
+                    print(x, y, x + scale_factor, y + scale_factor)
+                    self.walls.append(
+                        VerticalWall(
+                            0,
+                            x_pos = x + scale_factor / 2,
+                            bottom_y = y + scale_factor / 2,
+                            top_y = y + scale_factor / 2,
+                            thickness = scale_factor / 2
+                        ),
+
+                    )
+
 
 if __name__ == "__main__":
     import gym
@@ -576,7 +604,7 @@ if __name__ == "__main__":
 
     # e = gym.make('Point2D-Box-Wall-v1')
     # e = gym.make('Point2D-Big-UWall-v1')
-    e = gym.make('Point2D-Easy-UWall-v1')
+    # e = gym.make('Point2D-Easy-UWall-v1')
     for i in range(1000):
         e.reset()
         for j in range(5):

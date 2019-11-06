@@ -64,7 +64,8 @@ import pygame
 #     reward_type='state_distance',
 #     reset_free=False,
 # )
-env = SawyerReachXYEnv()
+multiworld.envs.pygame.register_pygame_envs()
+env = gym.make('Point2D-Maze-v1')
 NDIM = env.action_space.low.size
 lock_action = False
 obs = env.reset()
