@@ -1,6 +1,8 @@
 from gym.envs.registration import register
 import logging
 
+import os
+
 LOGGER = logging.getLogger(__name__)
 REGISTERED = False
 
@@ -91,6 +93,12 @@ def register_pygame_envs():
         },
     )
     import numpy as np
+    maze_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        'maze/11x11_maze.npy'
+    )
+
+    radius = 0.3
     register(
         id='Point2D-Maze-v1',
         entry_point='multiworld.envs.pygame.point2d:Point2DBlockEnv',
@@ -99,14 +107,16 @@ def register_pygame_envs():
             'author': 'steven'
         },
         kwargs={
-            'action_scale': 1,
-            'block_matrix': np.load("/Users/steven/Downloads/maze.npy"),
-            'render_size': 400,
+            'action_scale': 0.25,
+            'block_matrix': np.load(maze_path),
+            'render_size': 500,
             'images_are_rgb': True,
             'render_onscreen': True,
             'render_target': True,
-            'target_radius': 0.25,
-            'ball_radius': 0.25,
+            'target_radius': radius,
+            'ball_radius': radius,
+            'randomize_position_on_reset': False,
+            'fixed_reset': np.array([3.9, -3.9])
         },
     )
 

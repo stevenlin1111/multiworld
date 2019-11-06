@@ -33,6 +33,7 @@ class Point2DEnv(MultitaskEnv, Serializable):
             ball_radius=0.50,
             walls=None,
             fixed_goal=None,
+            fixed_reset=None,
             randomize_position_on_reset=True,
             images_are_rgb=False,  # else black and white
             show_goal=True,
@@ -44,6 +45,9 @@ class Point2DEnv(MultitaskEnv, Serializable):
             walls = []
         if fixed_goal is not None:
             fixed_goal = np.array(fixed_goal)
+        if fixed_reset is not None:
+            assert not randomize_position_on_reset
+            self._fixed_position = fixed_reset
         if len(kwargs) > 0:
             LOGGER = logging.getLogger(__name__)
             LOGGER.log(logging.WARNING, "WARNING, ignoring kwargs:", kwargs)
@@ -138,7 +142,8 @@ class Point2DEnv(MultitaskEnv, Serializable):
                 self.obs_range.low,
                 self.obs_range.high,
             )
-
+        else:
+            self._position = self._fixed_position
         return self._get_obs()
 
     def _position_inside_wall(self, pos):
