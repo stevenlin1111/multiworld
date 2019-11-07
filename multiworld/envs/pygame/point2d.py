@@ -135,8 +135,11 @@ class Point2DEnv(MultitaskEnv, Serializable):
         return ob, reward, done, info
 
 
-    def reset(self):
-        self._target_position = self.sample_goal()['state_desired_goal']
+    def reset(self, goal=None):
+        if goal is not None:
+            self._target_position = goal['state_desired_goal']
+        else:
+            self._target_position = self.sample_goal()['state_desired_goal']
         if self.randomize_position_on_reset:
             self._position = self._sample_position(
                 self.obs_range.low,
@@ -594,29 +597,54 @@ class Point2DBlockEnv(Point2DEnv):
         self.quick_init(locals())
         super().__init__(*args, **kwargs)
         self.walls = []
-        scale_factor = self.boundary_dist * 2 / len(block_matrix)
+        self.scale_factor = self.boundary_dist * 2 / len(block_matrix)
         self.inner_wall_max_dist = 1
         self.wall_thickness = 0.5
+        self.block_matrix = block_matrix
+
         for row_idx, row in enumerate(block_matrix):
             for col_idx, val in enumerate(row):
                 if val:
-                    print(row_idx, col_idx)
                     # Because the window is (-boundary_dist, boundary_dist)
                     # instead of (0, 2 * boundary_dist)
-                    y = -self.boundary_dist + row_idx * scale_factor
-                    x = -self.boundary_dist + col_idx * scale_factor
-                    print(x, y, x + scale_factor, y + scale_factor)
+                    # y = -self.boundary_dist + row_idx *block_width
+                    # x = -self.boundary_dist + col_idx * block_width
+                    x, y = self.get_block_xy(row_idx, col_idx)
                     self.walls.append(
                         VerticalWall(
                             0,
-                            x_pos = x + scale_factor / 2,
-                            bottom_y = y + scale_factor / 2,
-                            top_y = y + scale_factor / 2,
-                            thickness = scale_factor / 2
+                            x_pos = x + self.block_width / 2,
+                            bottom_y = y + self.block_width / 2,
+                            top_y = y + self.block_width / 2,
+                            thickness = self.block_width / 2
                         ),
-
                     )
+        self.mode = "train"
 
+    @property
+    def block_width(self):
+        return self.scale_factor
+
+    def get_block_xy(self, block_row_idx, block_col_idx):
+        y = -self.boundary_dist + block_row_idx * self.block_width
+        x = -self.boundary_dist + block_col_idx * self.block_width
+        return (x, y)
+
+    def get_eval_paths(self):
+        goals = []
+        for row_idx, row in enumerate(block_matrix):
+            for col_idx, val in enumerate(row):
+                # This is an open spot. We assume it is reachable from the start
+                # position.
+                if not val:
+                    goals.append(get_block_xy(row_idx, col_idx))
+        return goals
+
+    def train(self):
+        self.mode = "train"
+
+    def test(self):
+        self.mode = "test"
 
 if __name__ == "__main__":
     import gym
