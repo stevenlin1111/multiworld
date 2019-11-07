@@ -93,12 +93,6 @@ def register_pygame_envs():
         },
     )
     import numpy as np
-    maze_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        'maze/11x11_maze.npy'
-    )
-
-    radius = 0.3
     register(
         id='Point2D-Maze-v1',
         entry_point='multiworld.envs.pygame.point2d:Point2DBlockEnv',
@@ -108,17 +102,48 @@ def register_pygame_envs():
         },
         kwargs={
             'action_scale': 0.25,
-            'block_matrix': np.load(maze_path),
+            'block_matrix': np.load(
+                os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
+                    'maze/11x11_maze.npy'
+                )
+            ),
             'render_size': 500,
             'images_are_rgb': True,
             'render_onscreen': True,
             'render_target': True,
-            'target_radius': radius,
-            'ball_radius': radius,
+            'target_radius': 0.3,
+            'ball_radius': 0.3,
             'randomize_position_on_reset': False,
             'fixed_reset': np.array([3.9, -3.9])
         },
     )
+    register(
+        id='Point2D-Rooms-v1',
+        entry_point='multiworld.envs.pygame.point2d:Point2DBlockEnv',
+        tags={
+            'git-commit-hash': '73c8823',
+            'author': 'steven'
+        },
+        kwargs={
+            'action_scale': 0.25,
+            'block_matrix': np.load(
+                os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
+                    'maze/four_room.npy'
+                )
+            ),
+            'render_size': 500,
+            'images_are_rgb': True,
+            'render_onscreen': True,
+            'render_target': True,
+            'target_radius': 0.3,
+            'ball_radius': 0.3,
+            'randomize_position_on_reset': False,
+            'fixed_reset': np.array([3.9, -3.9])
+        },
+    )
+
 
     register(
         id='Point2DEnv-ImageFixedGoal-v0',
