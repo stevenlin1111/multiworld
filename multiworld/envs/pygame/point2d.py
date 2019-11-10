@@ -66,6 +66,7 @@ class Point2DEnv(MultitaskEnv, Serializable):
         self.randomize_position_on_reset = randomize_position_on_reset
         self.images_are_rgb = images_are_rgb
         self.show_goal = show_goal
+        self.ignore_previous_position = False
 
         self.max_target_distance = self.boundary_dist - self.target_radius
 
@@ -93,11 +94,20 @@ class Point2DEnv(MultitaskEnv, Serializable):
         assert self.action_scale <= 1.0
         velocities = np.clip(velocities, a_min=-1, a_max=1) * self.action_scale
         new_position = self._position + velocities
+        return self.step_by_position(new_position, velocities)
+
+    def step_by_position(self, new_position, action):
         orig_new_pos = new_position.copy()
         for wall in self.walls:
-            new_position = wall.handle_collision(
-                self._position, new_position
+            needs_collision_check = (
+                not self.ignore_previous_position or
+                wall.contains_point(new_position)
             )
+
+            if needs_collision_check:
+                new_position = wall.handle_collision(
+                    self._position, new_position
+                )
         if sum(new_position != orig_new_pos) > 1:
             """
             Hack: sometimes you get caught on two walls at a time. If you
@@ -122,13 +132,12 @@ class Point2DEnv(MultitaskEnv, Serializable):
         is_success = distance_to_target < self.target_radius
 
         ob = self._get_obs()
-        reward = self.compute_reward(velocities, ob)
+
+        reward = self.compute_reward(action, ob)
         info = {
             'radius': self.target_radius,
             'target_position': self._target_position,
             'distance_to_target': distance_to_target,
-            'velocity': velocities,
-            'speed': np.linalg.norm(velocities),
             'is_success': is_success,
         }
         done = False
@@ -593,7 +602,9 @@ class Point2DWallEnv(Point2DEnv):
             self.walls = []
 
 class Point2DBlockEnv(Point2DEnv):
-    def __init__(self, block_matrix, *args, **kwargs):
+    def __init__(self, block_matrix, action_as_position=False,
+                 random_steps=1, random_step_variance=.2,
+                 *args, **kwargs):
         self.quick_init(locals())
         super().__init__(*args, **kwargs)
         self.walls = []
@@ -601,6 +612,10 @@ class Point2DBlockEnv(Point2DEnv):
         self.inner_wall_max_dist = 1
         self.wall_thickness = 0.5
         self.block_matrix = block_matrix
+        self.action_as_position = action_as_position
+        self.random_steps = random_steps
+        self.random_step_variance = random_step_variance
+        self.ignore_previous_position = True
 
         for row_idx, row in enumerate(block_matrix):
             for col_idx, val in enumerate(row):
@@ -645,6 +660,18 @@ class Point2DBlockEnv(Point2DEnv):
 
     def test(self):
         self.mode = "test"
+
+    def step(self, action):
+        if self.action_as_position:
+            ob, reward, done, info = self.step_by_position(action, action)
+            for _ in range(self.random_steps):
+                random_action = np.random.normal(0, self.random_step_variance, 2)
+                self.ignore_previous_position = False
+                ob, reward, done, info = super().step(random_action)
+                self.ignore_previous_position = True
+            return ob, reward, done, info
+        else:
+            return super().step(action)
 
 if __name__ == "__main__":
     import gym

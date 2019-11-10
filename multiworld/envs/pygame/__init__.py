@@ -143,7 +143,58 @@ def register_pygame_envs():
             'fixed_reset': np.array([3.9, -3.9])
         },
     )
+    register(
+        id='Point2D-Rooms-Oracle-v1',
+        entry_point='multiworld.envs.pygame.point2d:Point2DBlockEnv',
+        tags={
+            'git-commit-hash': '73c8823',
+            'author': 'steven'
+        },
+        kwargs={
+            'block_matrix': np.load(
+                os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
+                    'maze/four_room.npy'
+                )
+            ),
+            'render_size': 500,
+            'images_are_rgb': True,
+            'render_onscreen': True,
+            'render_target': True,
+            'action_scale': 0.1,
+            'target_radius': 0.05,
+            'ball_radius': 0.05,
+            'randomize_position_on_reset': False,
+            'fixed_reset': np.array([3.9, -3.9]),
+            'boundary_dist': 1,
+            'action_as_position': True,
+        },
+    )
 
+    register(
+        id='Point2D-Maze-Oracle-v1',
+        entry_point='multiworld.envs.pygame.point2d:Point2DBlockEnv',
+        tags={
+            'git-commit-hash': '73c8823',
+            'author': 'steven'
+        },
+        kwargs={
+            'block_matrix': np.load(
+                os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
+                    'maze/11x11_maze.npy'
+                )
+            ),
+            'render_size': 500,
+            'action_scale': 0.1,
+            'target_radius': 0.05,
+            'ball_radius': 0.05,
+            'randomize_position_on_reset': False,
+            'fixed_reset': np.array([3.9, -3.9]),
+            'boundary_dist': 1,
+            'action_as_position': True,
+        },
+    )
 
     register(
         id='Point2DEnv-ImageFixedGoal-v0',
