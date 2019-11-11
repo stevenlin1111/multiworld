@@ -663,6 +663,7 @@ class Point2DBlockEnv(Point2DEnv):
 
     def step(self, action):
         if self.action_as_position:
+            action = np.clip(action, -self.boundary_dist, self.boundary_dist)
             ob, reward, done, info = self.step_by_position(action, action)
             for _ in range(self.random_steps):
                 random_action = np.random.normal(0, self.random_step_variance, 2)
