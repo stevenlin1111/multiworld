@@ -182,7 +182,7 @@ def register_pygame_envs():
             'block_matrix': np.load(
                 os.path.join(
                     os.path.dirname(os.path.realpath(__file__)),
-                    'maze/11x11_maze.npy'
+                    'maze/11x11_maze_v2.npy'
                 )
             ),
             'render_size': 500,
