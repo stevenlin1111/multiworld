@@ -154,18 +154,18 @@ def register_pygame_envs():
             'block_matrix': np.load(
                 os.path.join(
                     os.path.dirname(os.path.realpath(__file__)),
-                    'maze/four_room.npy'
+                    'maze/four_room_v2.npy'
                 )
             ),
             'render_size': 500,
             'images_are_rgb': True,
             'render_onscreen': True,
             'render_target': True,
-            'action_scale': 0.1,
-            'target_radius': 0.5,
-            'ball_radius': 0.5,
+            'action_scale': 1,
+            'target_radius': 0.1,
+            'ball_radius': 0.1,
             'randomize_position_on_reset': False,
-            'fixed_reset': np.array([9.5, -9.5]),
+            'fixed_reset': np.array([0.0, 0.0]),
             'boundary_dist': 10,
             'action_as_position': True,
         },
@@ -186,11 +186,11 @@ def register_pygame_envs():
                 )
             ),
             'render_size': 500,
-            'action_scale': 0.1,
+            'action_scale': 1,
             'target_radius': 0.05,
             'ball_radius': 0.05,
             'randomize_position_on_reset': False,
-            'fixed_reset': np.array([0.95, -0.95]),
+            'fixed_reset': np.array([0, 0]),
             'boundary_dist': 1,
             'action_as_position': True,
         },
