@@ -154,6 +154,33 @@ def register_pygame_envs():
             'block_matrix': np.load(
                 os.path.join(
                     os.path.dirname(os.path.realpath(__file__)),
+                    'maze/four_room.npy'
+                )
+            ),
+            'render_size': 500,
+            'images_are_rgb': True,
+            'render_onscreen': True,
+            'render_target': True,
+            'action_scale': 1,
+            'target_radius': 0.1,
+            'ball_radius': 0.1,
+            'randomize_position_on_reset': False,
+            'fixed_reset': np.array([0.0, 0.0]),
+            'boundary_dist': 10,
+            'action_as_position': True,
+        },
+    )
+    register(
+        id='Point2D-Rooms-Oracle-v2',
+        entry_point='multiworld.envs.pygame.point2d:Point2DBlockEnv',
+        tags={
+            'git-commit-hash': '73c8823',
+            'author': 'steven'
+        },
+        kwargs={
+            'block_matrix': np.load(
+                os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
                     'maze/four_room_v2.npy'
                 )
             ),
@@ -168,6 +195,36 @@ def register_pygame_envs():
             'fixed_reset': np.array([0.0, 0.0]),
             'boundary_dist': 10,
             'action_as_position': True,
+        },
+    )
+
+    register(
+        id='Point2D-Rooms-Oracle-Offset-v1',
+        entry_point='multiworld.envs.pygame.point2d:OffsetEnv',
+        tags={
+            'git-commit-hash': '73c8823',
+            'author': 'steven'
+        },
+        kwargs={
+            'block_matrix': np.load(
+                os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
+                    'maze/four_room.npy'
+                )
+            ),
+            'render_size': 500,
+            'images_are_rgb': True,
+            'render_onscreen': True,
+            'render_target': True,
+            'action_scale': 1,
+            'target_radius': 0.1,
+            'ball_radius': 0.1,
+            'randomize_position_on_reset': False,
+            'fixed_reset': np.array([5.0, 5.0]),
+            'boundary_dist': 10,
+            'action_as_position': True,
+            'offset_x': -5,
+            'offset_y': -5,
         },
     )
 

@@ -601,6 +601,7 @@ class Point2DWallEnv(Point2DEnv):
         if wall_shape == "none":
             self.walls = []
 
+
 class Point2DBlockEnv(Point2DEnv):
     def __init__(self, block_matrix, action_as_position=False,
                  random_steps=1, random_step_variance=.2,
@@ -616,6 +617,13 @@ class Point2DBlockEnv(Point2DEnv):
         self.random_steps = random_steps
         self.random_step_variance = random_step_variance
         self.ignore_previous_position = True
+
+        self.num_empty_blocks = 0
+
+        self.coverage_map = [
+            [False for _ in row]
+            for row in self.block_matrix
+        ]
 
         for row_idx, row in enumerate(block_matrix):
             for col_idx, val in enumerate(row):
@@ -634,16 +642,37 @@ class Point2DBlockEnv(Point2DEnv):
                             thickness = self.block_width / 2
                         ),
                     )
+                else:
+                    self.num_empty_blocks += 1
         self.mode = "train"
 
     @property
     def block_width(self):
         return self.scale_factor
 
+    @property
+    def coverage(self):
+        num_blocks_explored = 0
+        for row in self.coverage_map:
+            for is_explored in row:
+                if is_explored:
+                    num_blocks_explored += 1
+        return num_blocks_explored / self.num_empty_blocks
+
     def get_block_xy(self, block_row_idx, block_col_idx):
         y = -self.boundary_dist + block_row_idx * self.block_width
         x = -self.boundary_dist + block_col_idx * self.block_width
         return (x, y)
+
+    def xy_to_block_idx(self, x, y):
+        block_col = (x + self.boundary_dist) // self.block_width
+        block_row = (y + self.boundary_dist) // self.block_width
+        return int(block_row), int(block_col)
+
+    def debug_info(self):
+        info = OrderedDict()
+        info['env/coverage'] = self.coverage
+        return info
 
     def get_eval_paths(self):
         goals = []
@@ -661,6 +690,18 @@ class Point2DBlockEnv(Point2DEnv):
     def test(self):
         self.mode = "test"
 
+    def handle_coverage(self, obs):
+        xy = obs['state_achieved_goal']
+        block_row, block_col = self.xy_to_block_idx(xy[0], xy[1])
+        if (
+            block_row >= len(self.coverage_map) or
+            block_col >= len(self.coverage_map[0])
+        ):
+            return
+        if self.block_matrix[block_row][block_col]:
+            return
+        self.coverage_map[block_row][block_col] = True
+
     def step(self, action):
         if self.action_as_position:
             action = np.clip(action, -self.boundary_dist, self.boundary_dist)
@@ -670,9 +711,42 @@ class Point2DBlockEnv(Point2DEnv):
                 self.ignore_previous_position = False
                 ob, reward, done, info = super().step(random_action)
                 self.ignore_previous_position = True
+            self.handle_coverage(ob)
             return ob, reward, done, info
         else:
-            return super().step(action)
+            obs, reward, done, info = super().step(action)
+            self.handle_coverage(obs)
+            return obs, reward, done, info
+
+class OffsetEnv(Point2DBlockEnv):
+    def __init__(self, offset_x, offset_y, *args, **kwargs):
+        self.quick_init(locals())
+        super().__init__(*args, **kwargs)
+        self.offset_x = offset_x
+        self.offset_y = offset_y
+
+    def offset_obs(self, obs):
+        new_obs = {}
+        for k, v in obs.items():
+            x, y = v[0], v[1]
+            new_obs[k] = np.array([x + self.offset_x, y + self.offset_y])
+        return new_obs
+
+    def unoffset_action(self, action):
+        action_x, action_y = action[0], action[1]
+        return np.array([action_x - self.offset_x, action_y - self.offset_y])
+
+    def reset(self):
+        obs = super().reset()
+        obs = self.offset_obs(obs)
+        return obs
+
+    def step(self, action):
+        action = self.unoffset_action(action)
+        obs, reward, done, info = super().step(action)
+        obs = self.offset_obs(obs)
+        return obs, reward, done, info
+
 
 if __name__ == "__main__":
     import gym
