@@ -611,6 +611,73 @@ class Point2DWallEnv(Point2DEnv):
                     self.wall_thickness
                 )
             ]
+        if wall_shape == "4-|":
+            min_val = 1.25
+            max_val = 2.25
+            self.max_val = max_val
+            self.min_val = min_val
+            self.walls = [
+                HorizontalWall(
+                    self.ball_radius,
+                    max_val * self.inner_wall_max_dist,
+                    min_val * self.inner_wall_max_dist,
+                    max_val * self.inner_wall_max_dist,
+                    self.wall_thickness
+                ),
+                VerticalWall(
+                    self.ball_radius,
+                    max_val * self.inner_wall_max_dist,
+                    min_val * self.inner_wall_max_dist,
+                    max_val * self.inner_wall_max_dist,
+                    self.wall_thickness
+                ),
+                HorizontalWall(
+                    self.ball_radius,
+                    max_val * self.inner_wall_max_dist,
+                    -max_val * self.inner_wall_max_dist,
+                    -min_val * self.inner_wall_max_dist,
+                    self.wall_thickness,
+                ),
+                VerticalWall(
+                    self.ball_radius,
+                    -max_val * self.inner_wall_max_dist,
+                    min_val * self.inner_wall_max_dist,
+                    max_val * self.inner_wall_max_dist,
+                    self.wall_thickness
+                ),
+
+                HorizontalWall(
+                    self.ball_radius,
+                    -max_val * self.inner_wall_max_dist,
+                    -max_val * self.inner_wall_max_dist,
+                    -min_val * self.inner_wall_max_dist,
+                    self.wall_thickness,
+                ),
+                VerticalWall(
+                    self.ball_radius,
+                    -max_val * self.inner_wall_max_dist,
+                    -max_val * self.inner_wall_max_dist,
+                    -min_val * self.inner_wall_max_dist,
+                    self.wall_thickness
+                ),
+
+
+                HorizontalWall(
+                    self.ball_radius,
+                    -max_val * self.inner_wall_max_dist,
+                    min_val * self.inner_wall_max_dist,
+                    max_val * self.inner_wall_max_dist,
+                    self.wall_thickness,
+                ),
+                VerticalWall(
+                    self.ball_radius,
+                    max_val * self.inner_wall_max_dist,
+                    -max_val * self.inner_wall_max_dist,
+                    -min_val * self.inner_wall_max_dist,
+                    self.wall_thickness
+                ),
+            ]
+
         if wall_shape == "big-u":
             self.walls = [
                 VerticalWall(

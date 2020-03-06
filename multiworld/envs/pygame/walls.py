@@ -128,7 +128,7 @@ class HorizontalWall(Wall):
         max_y = y_pos + min_dist + thickness
         min_x = left_x - min_dist - thickness
         max_x = right_x + min_dist + thickness
-        assert min_x < max_x
+        assert min_x < max_x, "min_x, max_x: ({}, {})".format(min_x, max_x)
         super().__init__(
             min_x=min_x,
             max_x=max_x,

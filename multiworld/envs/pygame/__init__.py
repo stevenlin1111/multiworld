@@ -47,6 +47,21 @@ def bottom_corner_sampler(env, batch_size):
         desired_goal=pos
     )
 
+def full_corner_sampler(env, batch_size):
+    low = np.array([
+        1.5 * env.inner_wall_max_dist - env.wall_thickness,
+        1.5 * env.inner_wall_max_dist - env.wall_thickness])
+    high = np.array([env.boundary_dist, env.boundary_dist])
+    pos = [env._sample_position(low, high) for _ in range(batch_size)]
+    pos = np.r_[pos].reshape(batch_size, 2)
+    pos *= 2 * np.random.randint(2, size=(batch_size, 2)) - 1
+    return dict(
+        state_desired_goal=pos,
+        desired_goal=pos
+    )
+
+
+
 def register_pygame_envs():
     global REGISTERED
     if REGISTERED:
@@ -163,6 +178,29 @@ def register_pygame_envs():
             'reward_type': 'dense_l1',
         },
     )
+    register(
+        id='Point2DEnv-4-Wall-v0',
+        entry_point='multiworld.envs.pygame.point2d:Point2DWallEnv',
+        tags={
+            'git-commit-hash': '166f0f3',
+            'author': 'steven'
+        },
+        kwargs={
+            'images_are_rgb': True,
+            'target_radius': 0.5,
+            'ball_radius': 0.5,
+            'action_scale': 0.15,
+            'render_onscreen': False,
+            'fixed_reset': np.array([0, 0]),
+            'use_fixed_reset_for_eval': True,
+            'wall_shape': '4-|',
+            'wall_thickness': 0.5,
+            'eval_goal_sampler': full_corner_sampler,
+            'randomize_position_on_reset': True,
+            'reward_type': 'dense_l1',
+        },
+    )
+
     register(
         id='Point2DLargeEnv-offscreen-v0',
         entry_point='multiworld.envs.pygame.point2d:Point2DEnv',
