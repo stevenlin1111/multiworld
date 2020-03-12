@@ -179,6 +179,29 @@ def register_pygame_envs():
         },
     )
     register(
+        id='Point2DEnv-Wall-h-v0',
+        entry_point='multiworld.envs.pygame.point2d:Point2DWallEnv',
+        tags={
+            'git-commit-hash': '166f0f3',
+            'author': 'steven'
+        },
+        kwargs={
+            'images_are_rgb': True,
+            'target_radius': 0.5,
+            'ball_radius': 0.5,
+            'action_scale': 0.15,
+            'render_onscreen': False,
+            'fixed_reset': np.array([3, -3]),
+            'use_fixed_reset_for_eval': True,
+            'wall_shape': 'block',
+            'wall_thickness': 0.5,
+            'eval_goal_sampler': bottom_corner_sampler,
+            'randomize_position_on_reset': True,
+            'reward_type': 'dense_l1',
+        },
+    )
+
+    register(
         id='Point2DEnv-4-Wall-v0',
         entry_point='multiworld.envs.pygame.point2d:Point2DWallEnv',
         tags={

@@ -611,6 +611,20 @@ class Point2DWallEnv(Point2DEnv):
                     self.wall_thickness
                 )
             ]
+        if wall_shape == "block":
+            min_val = 0
+            max_val = 2.25
+            self.max_val = max_val
+            self.min_val = min_val
+            self.walls = [
+                HorizontalWall(
+                    self.ball_radius,
+                    0,
+                    min_val * self.inner_wall_max_dist,
+                    self.boundary_dist,
+                    self.wall_thickness
+                ),
+            ]
         if wall_shape == "4-|":
             min_val = 1.25
             max_val = 2.25
